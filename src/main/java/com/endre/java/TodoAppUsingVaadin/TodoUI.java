@@ -1,5 +1,7 @@
 package com.endre.java.TodoAppUsingVaadin;
 
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
@@ -41,9 +43,23 @@ public class TodoUI extends UI {
         formLayout.setWidth("80%");
 
         TextField task = new TextField();
-        Button add = new Button("add");
+        Button add = new Button("");
+        add.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        add.setIcon(VaadinIcons.PLUS);
 
-        formLayout.addComponents(task, add);
+        //Task vil få all plass som er til overs.
+        formLayout.addComponentsAndExpand(task);
+        formLayout.addComponents(add);
+
+
+        add.addClickListener(click-> {
+            todoLayout.add(new Todo(task.getValue()));
+            task.clear();
+            task.focus();
+        });
+        task.focus();
+        add.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+
         root.addComponent(formLayout);
     }
 
@@ -53,7 +69,9 @@ public class TodoUI extends UI {
     }
 
     private void addDeleteButton() {
-        root.addComponent(new Button("Delete completed"));
+        root.addComponent(new Button("Delete completed", click -> {
+            todoLayout.deleteCompleted();
+        }));
     }
 
 
