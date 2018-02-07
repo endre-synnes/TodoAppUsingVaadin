@@ -1,41 +1,35 @@
 package com.endre.java.TodoAppUsingVaadin;
 
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.VerticalLayout;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.vaadin.data.Binder;
+import com.vaadin.shared.ui.ValueChangeMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
+public class TodoLayout extends HorizontalLayout{
 
-@SpringComponent
-public class TodoLayout extends VerticalLayout{
+    private final CheckBox done;
+    private final TextField text;
 
-    @Autowired
-    TodoRepository repo;
+    public TodoLayout(Todo todo, TodoChangeListener changeListener) {
+        setWidth("100%");
+        setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 
-    @PostConstruct
-    void init(){
-        update();
-    }
+        done = new CheckBox();
+        text = new TextField();
+        text.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
+        text.setValueChangeMode(ValueChangeMode.BLUR);
 
+        Binder<Todo> binder = new Binder<>(Todo.class);
+        binder.bindInstanceFields(this);
+        binder.setBean(todo);
 
-    private void update() {
-        setTodos(repo.findAll());
-    }
+        addComponents(done);
+        addComponentsAndExpand(text);
 
-    public void setTodos(List<Todo> todos) {
-        removeAllComponents();
-        todos.forEach(todo -> addComponent(new TodoItemLayout(todo)));
-    }
+        binder.addValueChangeListener(event -> changeListener.todoChange(todo));
 
-
-    public void add(Todo todo){
-        repo.save(todo);
-        update();
-    }
-
-    public void deleteCompleted() {
-        repo.deleteByDone(true);
-        update();
     }
 }

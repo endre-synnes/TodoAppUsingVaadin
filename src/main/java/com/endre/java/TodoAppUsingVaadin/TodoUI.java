@@ -1,5 +1,6 @@
 package com.endre.java.TodoAppUsingVaadin;
 
+import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
@@ -9,13 +10,14 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringUI
+@Theme("valo")
 public class TodoUI extends UI {
 
     private VerticalLayout root;
 
 
     @Autowired
-    TodoLayout todoLayout;
+    TodoList todoList;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -43,34 +45,33 @@ public class TodoUI extends UI {
         formLayout.setWidth("80%");
 
         TextField task = new TextField();
+        task.focus();
         Button add = new Button("");
-        add.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        add.setIcon(VaadinIcons.PLUS);
 
         //Task vil få all plass som er til overs.
         formLayout.addComponentsAndExpand(task);
         formLayout.addComponents(add);
+        root.addComponent(formLayout);
 
+        add.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        add.setIcon(VaadinIcons.PLUS);
 
         add.addClickListener(click-> {
-            todoLayout.add(new Todo(task.getValue()));
+            todoList.add(new Todo(task.getValue()));
             task.clear();
             task.focus();
         });
-        task.focus();
         add.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
-        root.addComponent(formLayout);
     }
 
     private void addTodoList() {
-        todoLayout.setWidth("80%");
-        root.addComponent(todoLayout);
+        root.addComponent(todoList);
     }
 
     private void addDeleteButton() {
         root.addComponent(new Button("Delete completed", click -> {
-            todoLayout.deleteCompleted();
+            todoList.deleteCompleted();
         }));
     }
 
